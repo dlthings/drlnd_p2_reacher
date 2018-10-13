@@ -50,10 +50,10 @@ import matplotlib.pyplot as plt
 
 from ddpg_agent import Agent
 
+# create single DDPG Agent
 agent = Agent(state_size=state_size, action_size=action_size, random_seed=10)
 
-
-def ddpg(n_episodes=200, max_t=700):
+def ddpg(n_episodes=200, max_t=1000):
     scores_deque = deque(maxlen=100)
     scores = []
     max_score = -np.Inf
@@ -61,7 +61,7 @@ def ddpg(n_episodes=200, max_t=700):
 
         # reset the environment
         env_info = env.reset(train_mode=True)[brain_name]
-        states = env_info.vector_observations
+        states = env_info.vector_observations   # NOTE: size =
 
         agent.reset()
         score = 0
@@ -75,8 +75,8 @@ def ddpg(n_episodes=200, max_t=700):
 
             agent.step(states, actions, rewards, next_states, dones)
             states = next_states
-            score += rewards[0]
-            if dones[0]:
+            score += np.mean(rewards)
+            if any(dones):
                 break
 
         scores_deque.append(score)
@@ -89,3 +89,10 @@ def ddpg(n_episodes=200, max_t=700):
     return scores
 
 scores = ddpg()
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+plt.plot(np.arange(1, len(scores)+1), scores)
+plt.ylabel('Score')
+plt.xlabel('Episode #')
+plt.show()
